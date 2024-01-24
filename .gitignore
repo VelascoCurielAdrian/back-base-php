@@ -42,7 +42,7 @@ $RECYCLE.BIN/
 # These should never be under version control,
 # as it poses a security risk.
 # esta linea se descomenta ya que se lleva acabo una base de api rest con php
-.env
+# .env
 .vagrant
 Vagrantfile
 
