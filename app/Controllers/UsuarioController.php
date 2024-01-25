@@ -24,15 +24,13 @@ class UsuarioController extends ResourceController
 			$validationResult = $registroModel->validate(['nombre_completo' => $nombre_completo, 'usuario' => $usuario, 'password' => $password]);
 
 			if (!$validationResult) {
-				return $this->respond(Response::error(400, $registroModel->errors()));
+				return Response::FieldsError($registroModel->errors(), $this->response);
 			}
 
 			$usuarioBD = $registroModel->consultarUsuario($usuario);
 
 			if ($usuarioBD) {
-				return $this->response
-					->setStatusCode(409)
-					->setJSON(Response::error(409, 'El usuario ya existe'));
+				throw new \Exception('El usuario ya existe', 409);
 			}
 
 			$nuevoId = $registroModel->registroUsuario(
@@ -41,12 +39,9 @@ class UsuarioController extends ResourceController
 				password_hash($password, PASSWORD_DEFAULT)
 			);
 
-			return $this->response->setStatusCode(201)->setJSON(['data' => $nuevoId, 'message' => SUCCESS]);
+			return Response::SuccessRequest($nuevoId, $this->response, 201);
 		} catch (\Exception $e) {
-			$errorMessage = $e->getMessage();
-			return $this->response
-				->setStatusCode(501)
-				->setJSON(Response::error(501, $errorMessage));
+			return Response::BadRequest($e, $this->response);
 		}
 	}
 
@@ -62,28 +57,24 @@ class UsuarioController extends ResourceController
 			$validationResult = $loginModel->validate(['usuario' => $usuario, 'password' => $password]);
 
 			if (!$validationResult) {
-				return $this->respond(Response::error(400, $loginModel->errors()));
+				return Response::FieldsError($loginModel->errors(), $this->response);
 			}
 
 			$usuarioBD = $loginModel->consultarUsuario($usuario);
 
 			if (!$usuarioBD) {
-				return $this->response
-					->setStatusCode(4041)
-					->setJSON(Response::error(401, 'El usuario no existe'));
+				throw new \Exception('El usuario no existe', 401);
 			}
 
 			$verifcar_pasword = password_verify($password, $usuarioBD['password']);
 
 			if (!$verifcar_pasword) {
-				return $this->response
-					->setStatusCode(401)
-					->setJSON(Response::error(401, 'Contraseña incorrecta'));
+				throw new \Exception('Contraseña incorrecta', 401);
 			}
 
 			$token = FunctionJwt::generate($usuarioBD);
 
-			$response = [
+			$data = [
 				'usuarioBD' => [
 					'usuario' => $usuarioBD['usuario'],
 					'nombre_completo' => $usuarioBD['nombre_completo'],
@@ -91,12 +82,9 @@ class UsuarioController extends ResourceController
 				'token' => $token
 			];
 
-			return $this->response->setStatusCode(200)->setJSON([$response, 'message' => SUCCESS]);
+			return Response::SuccessRequest($data, $this->response);
 		} catch (\Exception $e) {
-			$errorMessage = $e->getMessage();
-			return $this->response
-				->setStatusCode(501)
-				->setJSON(Response::error(501, $errorMessage));
+			return Response::BadRequest($e, $this->response);
 		}
 	}
 }
