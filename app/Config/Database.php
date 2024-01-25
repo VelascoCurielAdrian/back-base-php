@@ -25,12 +25,11 @@ class Database extends Config
      * The default database connection.
      */
     public array $default = [
-        'DSN'          => '',
-        'hostname'     => 'localhost',
-        'username'     => '',
-        'password'     => '',
-        'database'     => '',
-        'DBDriver'     => 'MySQLi',
+        'DSN'          => 'postgre://fl0user:m3qzDGdNIl7h@ep-weathered-math-20862742.us-east-2.aws.neon.fl0.io:5432/curso?options=endpoint%3Dep-weathered-math-20862742',
+        'username'     => 'fl0user',
+        'password'     => 'm3qzDGdNIl7h',
+        'database'     => 'curso',
+        'DBDriver'     => 'postgre',
         'DBPrefix'     => '',
         'pConnect'     => false,
         'DBDebug'      => true,
@@ -41,10 +40,12 @@ class Database extends Config
         'compress'     => false,
         'strictOn'     => false,
         'failover'     => [],
-        'port'         => 3306,
+        'port'         => 5432,
         'numberNative' => false,
+        'sslmode'      => 'require',
+        'endpoint'     => 'ep-weathered-math-20862742',
     ];
-
+    
     /**
      * This database connection is used when
      * running PHPUnit database tests.
