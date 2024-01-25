@@ -20,10 +20,14 @@ class AuthFilter implements FilterInterface
   public function before(RequestInterface $request, $arguments = null)
   {
     $key = getenv('JWT_SECRET');
-    $authHeader = apache_request_headers()['Authorization'];
-    $authHeader = $authHeader->getValue();
-    $token = $authHeader;
+    $authHeader = $request->getHeaderLine('Authorization');
+    $token = null;
 
+    if (!empty($authHeader)) {
+      if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+        $token = $matches[1];
+      }
+    }
     if (is_null($token) || empty($token)) {
 
       $response = service('response');
